@@ -10,17 +10,20 @@ from .serializers import TodoSerializer, CategorySerializer
 
 class TodoAPIView(APIView):
     def get(self, request):
-        lst = Todo.objects.all().values()
-        return Response({'todos': list(lst)})
+        lst = Todo.objects.all()
+        return Response({'todos': TodoSerializer(lst, many=True).data})
 
     def post(self, request):
+        serializer = TodoSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         todo_new = Todo.objects.create(
             title = request.data['title'],
             content = request.data['content'],
             category_id = request.data['category_id']
         )
 
-        return Response({'post': model_to_dict(todo_new)})
+        return Response({'todo': TodoSerializer(todo_new).data})
 
 # class TodoAPIView(generics.ListAPIView):
 #     queryset = Todo.objects.all()
