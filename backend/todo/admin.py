@@ -3,5 +3,8 @@ from .models import Todo, Category
 
 # Register your models here.
 
-admin.site.register(Todo)
+class TodoAdmin(admin.ModelAdmin):
+    readonly_fields = ('pk',)
+
+admin.site.register(Todo, TodoAdmin)
 admin.site.register(Category)
