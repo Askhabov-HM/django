@@ -1,14 +1,31 @@
 from django.shortcuts import render
 from django.forms import model_to_dict
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from .models import Todo, Category
 from .serializers import *
 
-class TodoAPIList(generics.ListCreateAPIView):
-    queryset = Todo.objects.all()
+class TodoViewSet(viewsets.ModelViewSet):
     serializer_class = TodoSerializer
+
+    def get_queryset(self):
+        pk = self.kwargs.get('pk')
+
+        if not pk:
+            return Todo.objects.all()[:2]
+
+        return Todo.objects.filter(pk=pk)
+
+    @action(methods=['get'], detail=False)
+    def category(self, request):
+        cats = Category.objects.all()
+        return Response({'cats': [c.name for c in cats]})
+
+# class TodoAPIList(generics.ListCreateAPIView):
+#     queryset = Todo.objects.all()
+#     serializer_class = TodoSerializer
 
 # class TodoAPIView(APIView):
 #     def get(self, request):
